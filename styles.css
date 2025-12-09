@@ -1,0 +1,132 @@
+  .sidebar-v2-location
+    #conversations-panel
+    #new-conversation-right-side-bar
+    #contacts-highrise-right-side-bar-wrapper
+    nav {
+    padding-top: 8px;
+  }
+
+/* Show WhatsApp button for these two subaccounts */
+/* Hide Whatsapp button on all subaccount except Two Subaccount */
+#provider-select-popover .hr-popover__content .py-1:has(> div:nth-child(3)) > div:nth-child(2) {
+  display: none;
+}
+
+/* END OF Hide Whatsapp button on all subaccount except Credo */
+
+
+/* Hide Send Whatsapp Button for selected contacts on contacts page(More Dropdown) Except Credo */
+#quickfilters-bulk-actions-dropdown .n-dropdown-option:nth-of-type(3) {
+  display: none;
+}
+/* Hide Send Whatsapp Button for selected contacts on contacts page(More Dropdown) Except Credo */
+
+
+/* Uncomment or copy/paste following code and replace Lt8aBut0xLqluh28GJyr with new locationID */
+/* Conversation Screen CSS */
+/* :has(.sidebar-v2-location.Lt8aBut0xLqluh28GJyr)
+  #provider-select-popover
+  .hr-popover__content
+  .py-1:has(> div:nth-child(3))
+  > div:nth-child(2), */
+
+:has(.sidebar-v2-location.Lt8aBut0xLqluh28GJyr)
+  #provider-select-popover
+  .hr-popover__content
+  .py-1:has(> div:nth-child(3))
+  > div:nth-child(2),
+:has(.sidebar-v2-location.vLf4R8QvXDlDXK9gIr9H)
+  #provider-select-popover
+  .hr-popover__content
+  .py-1:has(> div:nth-child(3))
+  > div:nth-child(2) {
+  display: block !important;
+}
+
+/* Uncomment or copy/paste following code and replace Lt8aBut0xLqluh28GJyr with new locationID */
+/* Contact Screen CSS */
+/* :has(.sidebar-v2-location.Lt8aBut0xLqluh28GJyr)
+  #quickfilters-bulk-actions-dropdown .n-dropdown-option:nth-of-type(3), */
+
+
+:has(.sidebar-v2-location.Lt8aBut0xLqluh28GJyr)
+  #quickfilters-bulk-actions-dropdown .n-dropdown-option:nth-of-type(3),
+:has(.sidebar-v2-location.vLf4R8QvXDlDXK9gIr9H)
+  #quickfilters-bulk-actions-dropdown .n-dropdown-option:nth-of-type(3) {
+  display: block !important;
+}
+
+/* END OFHide Whatsapp button on all subaccount except Two Subaccount  */
+
+/* Rename General Info to ARIVE Details Conversation Details Custom Field */
+
+/* Hide General Info in Conversation Details Custom Field */
+
+#record-details-tabs .hr-tab-pane .vue-recycle-scroller .vue-recycle-scroller__item-view:nth-of-type(2) .hr-collapse-item__header-main p:first-of-type{
+    font-size: 0px;
+}
+
+/* Add ARRIVE Details text in Conversation Details Custom Field */
+
+/* Add ARIVE Details text with icon */
+#record-details-tabs .hr-tab-pane .vue-recycle-scroller .vue-recycle-scroller__item-view:nth-of-type(2) .hr-collapse-item__header-main p:first-of-type::before {
+    content: 'ARIVE Details';
+    font-size: 0.775rem;
+    height: 0px !important;
+}
+
+#record-details-tabs .hr-tab-pane .vue-recycle-scroller .vue-recycle-scroller__item-view:nth-of-type(2) .hr-collapse-item__header-main p{
+    height: 18px
+}
+
+/* Add icon before the text */
+#record-details-tabs .hr-tab-pane .vue-recycle-scroller .vue-recycle-scroller__item-view:nth-of-type(2) .hr-collapse-item__header-main p:first-of-type::before {
+    background-image: url('https://storage.googleapis.com/msgsndr/FTJnay91o7L6mDzHkzci/media/677ed1e73fc05421a9acf73a.png');
+    background-size: 24px 16px;
+    background-repeat: no-repeat;
+    padding-left: 28px;
+    padding-top: 1px;
+  
+}
+/* END OF Rename General Info to ARIVE Details Conversation Details Custom Field */
+
+/* Rename Business Name to LOAN ID */
+
+
+
+/* END OF Rename Business Name to LOAN ID */
+
+/* Hide native native delete contact detail page */
+
+button[aria-label*="listView.bulkActions.delete"] {
+    display: none !important;
+} 
+   
+
+#quickfilters-bulk-actions-dropdown .n-dropdown-option[data-dropdown-option="true"]:has(.n-dropdown-option-body__label span) {
+  display: none !important;
+}
+
+#quickfilters-bulk-actions-dropdown .n-dropdown-option[data-dropdown-option="true"]:has(.n-dropdown-option-body__label span:not(:contains("Delete"))) {
+  display: block !important;
+}
+
+
+  /* Hide native native delete */
+
+
+
+  /* hide in fo message on contact page */
+
+/* Target the span inside */
+/* Target the div */
+div[data-v-4a3f72e1].text-sm.text-gray-500.pt-3.-mb-4.italic.flex.items-center {
+  display: none !important;
+}
+
+/* Target the span inside */
+div[data-v-4a3f72e1].text-sm.text-gray-500.pt-3.-mb-4.italic.flex.items-center span[data-v-4a3f72e1] {
+  display: none !important;
+}
+
+
