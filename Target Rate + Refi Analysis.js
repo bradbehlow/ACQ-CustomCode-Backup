@@ -1,21 +1,22 @@
 <script>
-// for target rate ref button
-  
+
+    // for target rate ref button
+
   (function () {
     // ==========================================
     // SHARED CONFIGURATION & UTILITIES
     // ==========================================
-  
+
     const currentLocationId = getLocationIdFromUrl();
     console.log("DEBUG: Current Location ID:", currentLocationId);
-  
+
     let adj = 0;
-  
+
     var locationId1 = currentLocationId;
     var tokenPromise = (async () => {
       return await getAccessToken(locationId1);
     })();
-  
+
     // Field IDs (shared)
     var FIELD_IDS = {
       rate: "target_rate",
@@ -24,62 +25,65 @@
       alertSetBy: "ALERT_USER_FIELD_ID",
       nationalAverage: "national_average_rate",
     };
-  
+
     var mortgageTypeMap = {
       Conforming: "Conforming30YrFixed",
       Fha: "FHA30YrFixed",
       Va: "VA30YrFixed",
     };
-  
+
     // ==========================================
     // PAGE DETECTION & ROUTING
     // ==========================================
-  
+
     const isContactDetailPage = window.location.href.includes("/detail/");
-    const isConversationsPage = window.location.href.includes("/conversations/");
-  
+    const isConversationsPage =
+      window.location.href.includes("/conversations/");
+
     console.log("DEBUG: Page Detection", {
       isContactDetail: isContactDetailPage,
       isConversations: isConversationsPage,
     });
-  
+
     // ==========================================
     // SHARED HELPER FUNCTIONS
     // ==========================================
-  
+
     function getLocationIdFromUrl() {
       const url = window.location.href;
       const match = url.match(/location\/([^\/]+)/);
       return match ? match[1] : null;
     }
-  
+
     function getContactIdFromUrl() {
       const url = window.location.href;
       const match = url.match(/detail\/([a-zA-Z0-9]+)/);
       return match ? match[1] : null;
     }
-  
+
     function getContactIdFromConversationGlobal() {
       console.log("🔍 GETTING CONTACT ID FROM CONVERSATION");
       console.log("📍 Current URL:", window.location.href);
-  
+
       // Try multiple methods to get contact ID from conversation page
-  
+
       // Method 1: Check URL for contact ID
       const urlMatch = window.location.href.match(/contact[\/_]([a-zA-Z0-9]+)/);
       if (urlMatch) {
         console.log("📍 Found contact ID in URL:", urlMatch[1]);
         return urlMatch[1];
       }
-  
+
       // Method 2: Check for selected conversation elements
-      const conversationElements = document.querySelectorAll("[data-contact-id]");
-      if (conversationElements.length > 0) {
-        const contactId = conversationElements[0].getAttribute("data-contact-id");
+      const conversationElements =
+        document.querySelectorAll("[data-contact-id]");
+      if (conversationElements.length > 0 && conversationElements[0]) {
+        const contactId =
+          conversationElements[0].getAttribute("data-contact-id");
         console.log("📍 Found contact ID in data attribute:", contactId);
         return contactId;
       }
-  
+
       // Method 3: Look for active/selected conversation
       const activeConversation = document.querySelector(
         '.conversation-item.active, .conversation.selected, [class*="selected"][class*="conversation"]'
@@ -92,7 +96,7 @@
         console.log("📍 Found contact ID in active conversation:", contactId);
         return contactId;
       }
-  
+
       // Method 4: Check for contact info in page
       const contactInfo = document.querySelector(
         '[data-testid="contact-info"], .contact-info, .contact-details'
@@ -104,11 +108,11 @@
         console.log("📍 Found contact ID in contact info:", contactId);
         return contactId;
       }
-  
+
       console.log("❌ No contact ID found in conversation page");
       return null;
     }
-  
+
     async function getAccessToken(locationId1) {
       try {
         const response = await fetch(
@@ -121,7 +125,7 @@
         return null;
       }
     }
-  
+
     async function fetchContactDetails(contactId) {
       const token = await tokenPromise;
       try {
@@ -141,7 +145,7 @@
         return null;
       }
     }
-  
+
     async function fetchCustomFields(locationId1) {
       const token = await tokenPromise;
       try {
@@ -161,7 +165,7 @@
         return null;
       }
     }
-  
+
     async function getMortgageRates() {
       try {
         const response = await fetch("https://api.konnectd.io/mortgage-rate");
@@ -172,17 +176,17 @@
         return null;
       }
     }
-  
+
     // payment button
-  
+
     // Add this function in the SHARED HELPER FUNCTIONS section (after getMortgageRates function)
-  
+
     function hidePaymentButtons() {
       // Find all payment buttons by the SVG path signature
       const allButtons = document.querySelectorAll(
         "button.sidebar-option-button"
       );
-  
+
       allButtons.forEach((button) => {
         const svg = button.querySelector("svg");
         if (svg) {
@@ -195,11 +199,11 @@
         }
       });
     }
-  
+
     function setupPaymentButtonHiding() {
       // Initial hide
       hidePaymentButtons();
-  
+
       // Watch for new buttons being added
       const observer = new MutationObserver((mutations) => {
         for (const mutation of mutations) {
@@ -208,19 +212,19 @@
           }
         }
       });
-  
+
       observer.observe(document.body, {
         childList: true,
         subtree: true,
       });
-  
+
       // Also check periodically as a fallback
       setInterval(hidePaymentButtons, 1000);
     }
-  
+
     // [INCLUDE ALL YOUR MODAL FUNCTIONS HERE - createGHLCustomModal, showSuccessPopup, updateCustomFields, sendToFlask, showPopup3]
     // I'm keeping them abbreviated for length, but you should include the full versions
-  
+
     function createGHLCustomModal(
       title,
       ratesObject,
@@ -245,7 +249,7 @@
                       opacity: 0;
                       animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
                     `;
-  
+
       const modal = document.createElement("div");
       modal.style.cssText = `
                       background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
@@ -263,7 +267,7 @@
                       transform: scale(0.8) translateY(40px);
                       animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
                     `;
-  
+
       // Add keyframe animations
       const style = document.createElement("style");
       style.textContent = `
@@ -1075,7 +1079,7 @@
                       }
                     `;
       document.head.appendChild(style);
-  
+
       const generateCustomerContactsHTML = () => {
         if (!customerData || customerData.length === 0) {
           return `
@@ -1087,12 +1091,12 @@
                           ">No contacts selected</div>
                         `;
         }
-  
+
         const maxVisibleContacts = 3;
         const contactHeight = 30;
         const headerHeight = 36;
         const maxHeight = headerHeight + maxVisibleContacts * contactHeight;
-  
+
         const header = `
                         <div style="
                           display: flex;
@@ -1131,7 +1135,7 @@
                         </div>
               
                         <div style="overflow-y: auto; max-height: ${maxHeight}px; padding-right: 4px;">`;
-  
+
         let contactsHTML = customerData
           .map((customer) => {
             return `
@@ -1169,10 +1173,10 @@
                           `;
           })
           .join("");
-  
+
         return header + contactsHTML + "</div>";
       };
-  
+
       modal.innerHTML = `
                   <div class="floating-particles">
                       <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
@@ -1480,22 +1484,22 @@
                       </div>
                   </div>
               `;
-  
+
       overlay.appendChild(modal);
       document.body.appendChild(overlay);
-  
+
       // Radio button functionality
       const radioOptions = modal.querySelectorAll(".radio-option");
       const targetRateSection = modal.querySelector("#target-rate-section");
       const dropAmountSection = modal.querySelector("#drop-amount-section");
       const targetRateInput = modal.querySelector("#targetRateInput");
       const dropAmountInput = modal.querySelector("#dropAmountInput");
-  
+
       radioOptions.forEach((option) => {
         option.addEventListener("click", () => {
           radioOptions.forEach((opt) => opt.classList.remove("selected"));
           option.classList.add("selected");
-  
+
           const type = option.dataset.type;
           if (type === "target") {
             targetRateSection.style.display = "block";
@@ -1510,7 +1514,7 @@
           }
         });
       });
-  
+
       /* ---------- ADVANCED SETTINGS TOGGLE ---------- */
       const advToggle = modal.querySelector("#advancedToggle");
       const advSection = modal.querySelector("#advancedSection");
@@ -1530,17 +1534,17 @@
           advToggle.querySelector("i").style.transform = "";
         }
       });
-  
+
       /* ---------- INPUT MASK: "-" FIX + DECIMAL SAFE ---------- */
       const adjustmentInput = modal.querySelector("#adjustmentInput");
-  
+
       adjustmentInput.addEventListener("input", (e) => {
         const input = e.target;
         const oldVal = input.value;
         const oldPos = input.selectionStart;
-  
+
         let val = oldVal;
-  
+
         // Convert ".something" to "-0.something" if it starts with "."
         if (val.startsWith(".")) {
           val = "-0" + val;
@@ -1550,7 +1554,7 @@
           });
           return;
         }
-  
+
         // Convert "-.something" to "-0.something"
         if (val.startsWith("-.")) {
           const decimalPart = val.slice(2); // Get everything after "-."
@@ -1561,10 +1565,10 @@
           });
           return;
         }
-  
+
         // Keep only digits + one dot + one minus
         let clean = val.replace(/[^0-9.-]/g, "");
-  
+
         // Ensure only one minus at the start
         const minusCount = (clean.match(/-/g) || []).length;
         if (minusCount > 0) {
@@ -1575,15 +1579,15 @@
             clean = "-" + clean;
           }
         }
-  
+
         // Ensure only one decimal point
         const parts = clean.split(".");
         if (parts.length > 2) {
           clean = parts[0] + "." + parts.slice(1).join("");
         }
-  
+
         val = clean;
-  
+
         // Replace only if actually changed
         if (val !== oldVal) {
           const diff = val.length - oldVal.length;
@@ -1594,25 +1598,29 @@
           });
         }
       });
-  
+
       /* ---------- TOOLTIP FOR ADJUSTMENT ? ---------- */
       const adjTooltip = advSection.querySelector(".question-mark");
-      const tipHTML = adjTooltip.getAttribute("data-tip");
-      const tipSpan = document.createElement("span");
-      tipSpan.className = "tooltip-text";
-      tipSpan.innerHTML = tipHTML;
-      adjTooltip.style.position = "relative";
-      adjTooltip.appendChild(tipSpan);
-  
-      adjTooltip.addEventListener("mouseenter", () => {
-        tipSpan.style.visibility = "visible";
-        tipSpan.style.opacity = "1";
-      });
-      adjTooltip.addEventListener("mouseleave", () => {
-        tipSpan.style.visibility = "hidden";
-        tipSpan.style.opacity = "0";
-      });
-  
+      if (adjTooltip) {
+        const tipHTML = adjTooltip.getAttribute("data-tip");
+        if (tipHTML) {
+          const tipSpan = document.createElement("span");
+          tipSpan.className = "tooltip-text";
+          tipSpan.innerHTML = tipHTML;
+          adjTooltip.style.position = "relative";
+          adjTooltip.appendChild(tipSpan);
+
+          adjTooltip.addEventListener("mouseenter", () => {
+            tipSpan.style.visibility = "visible";
+            tipSpan.style.opacity = "1";
+          });
+          adjTooltip.addEventListener("mouseleave", () => {
+            tipSpan.style.visibility = "hidden";
+            tipSpan.style.opacity = "0";
+          });
+        }
+      }
+
       const tooltips = modal.querySelectorAll(".tooltip");
       tooltips.forEach((tooltip) => {
         tooltip.addEventListener("mouseenter", function () {
@@ -1622,7 +1630,7 @@
             tooltipText.style.opacity = "1";
           }
         });
-  
+
         tooltip.addEventListener("mouseleave", function () {
           const tooltipText = this.querySelector(".tooltiptext");
           if (tooltipText) {
@@ -1631,15 +1639,15 @@
           }
         });
       });
-  
+
       // event listener for dynamic rate update
       const mortgageTypeSelect = document.getElementById("mortgageTypeSelect");
       const currentRateDisplay = document.getElementById("currentRateDisplay");
-  
+
       mortgageTypeSelect.addEventListener("change", (e) => {
         const selectedType = e.target.value;
         currentRateDisplay.textContent = ratesObject[selectedType] + "%";
-  
+
         //smooth transition effect
         currentRateDisplay.style.opacity = 0;
         setTimeout(() => {
@@ -1647,7 +1655,7 @@
           currentRateDisplay.style.opacity = 1;
         }, 200);
       });
-  
+
       // Focus first input field automatically with a slight delay for animation
       setTimeout(() => {
         const select = document.getElementById("mortgageTypeSelect");
@@ -1655,7 +1663,7 @@
           select.focus();
         }
       }, 600);
-  
+
       return new Promise((resolve) => {
         const cleanup = () => {
           overlay.style.animation = "fadeOut 0.3s ease-out forwards";
@@ -1663,13 +1671,13 @@
             if (document.body.contains(overlay)) {
               document.body.removeChild(overlay);
             }
-  
+
             if (document.head.contains(style)) {
               document.head.removeChild(style);
             }
           }, 300);
         };
-  
+
         const getFormValues = () => {
           const mortgageType =
             document.getElementById("mortgageTypeSelect").value;
@@ -1681,14 +1689,15 @@
             document.getElementById("adjustmentInput").value || "";
           const selectedType = document.querySelector(".radio-option.selected")
             .dataset.type;
-  
+
           //   if (selectedType === "target" && !targetRateValue.trim()) {
           //     alert("Please enter a Target Rate value.");
           //     return null;
           //   }
-  
+
           // Only require target rate if NO advanced adjustment is provided
-          const hasAdjustment = adjustmentValue.trim() && adjustmentValue !== "-";
+          const hasAdjustment =
+            adjustmentValue.trim() && adjustmentValue !== "-";
           if (
             selectedType === "target" &&
             !targetRateValue.trim() &&
@@ -1697,12 +1706,12 @@
             alert("Please enter a Target Rate value or use Advanced Settings.");
             return null;
           }
-  
+
           if (selectedType === "drop" && !dropAmountValue.trim()) {
             alert("Please enter a Drop Amount value.");
             return null;
           }
-  
+
           // If advanced adjustment is provided, auto-calculate the target rate
           let finalTargetRate = targetRateValue;
           if (selectedType === "target" && hasAdjustment) {
@@ -1711,7 +1720,7 @@
             const adjustmentNum = parseFloat(adjustmentValue);
             finalTargetRate = (currentNationalAvg + adjustmentNum).toFixed(3);
           }
-  
+
           return {
             mortgageType: mortgageType,
             mortgageTypeValue: mortgageTypeMap[mortgageType] || mortgageType,
@@ -1721,12 +1730,12 @@
             alertType: selectedType,
           };
         };
-  
+
         document.getElementById("closeButton").addEventListener("click", () => {
           cleanup();
           resolve(null);
         });
-  
+
         document
           .getElementById("customModalConfirm")
           .addEventListener("click", () => {
@@ -1736,14 +1745,14 @@
               resolve(values);
             }
           });
-  
+
         document
           .getElementById("customModalCancel")
           .addEventListener("click", () => {
             cleanup();
             resolve(null);
           });
-  
+
         const handleEnterKey = (e) => {
           if (e.key === "Enter") {
             const values = getFormValues();
@@ -1753,14 +1762,14 @@
             }
           }
         };
-  
+
         document
           .getElementById("targetRateInput")
           .addEventListener("keypress", handleEnterKey);
         document
           .getElementById("dropAmountInput")
           .addEventListener("keypress", handleEnterKey);
-  
+
         document.addEventListener("keydown", function escapeHandler(e) {
           if (e.key === "Escape") {
             cleanup();
@@ -1768,7 +1777,7 @@
             document.removeEventListener("keydown", escapeHandler);
           }
         });
-  
+
         overlay.addEventListener("click", (e) => {
           if (e.target === overlay) {
             cleanup();
@@ -1777,8 +1786,8 @@
         });
       });
     }
-  
-    function showSuccessPopup(message, autoClose = true) {
+
+    function showSuccessPopup(message, autoClose = false) {
       const overlay = document.createElement("div");
       overlay.style.cssText = `
                                 position: fixed;
@@ -1797,7 +1806,7 @@
                                 opacity: 0;
                                 animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
                             `;
-  
+
       const popup = document.createElement("div");
       popup.style.cssText = `
                                 background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
@@ -1815,7 +1824,7 @@
                                 transform: scale(0.8) translateY(40px);
                                 animation: modalSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
                             `;
-  
+
       const style = document.createElement("style");
       style.textContent = `
                                 @keyframes fadeIn {
@@ -1885,7 +1894,7 @@
                                 }
                             `;
       document.head.appendChild(style);
-  
+
       popup.innerHTML = `
                                 <div class="floating-particles">
                                     <div class="particle" style="left: 15%; animation-delay: 0s;"></div>
@@ -1965,7 +1974,9 @@
                                             line-height: 1.5;
                                             color: #64748b;
                                         ">
-                                            You can view and manage all rate alerts on your dashboard.
+                                            <span id="dashboardLink" style="color: #3b82f6; text-decoration: underline; font-weight: 500; cursor: pointer;">
+                                                You can view and manage all rate alerts on your dashboard.
+                                            </span>
                                         </div>
                                     </div>
               
@@ -2000,53 +2011,53 @@
                                     </button>
                                 </div>
                             `;
-  
+
       overlay.appendChild(popup);
       document.body.appendChild(overlay);
-  
+
       const closePopup = () => {
         overlay.style.animation = "fadeOut 0.3s ease-out forwards";
         setTimeout(() => {
           if (document.body.contains(overlay)) {
             document.body.removeChild(overlay);
           }
-  
+
           if (document.head.contains(style)) {
             document.head.removeChild(style);
           }
-  
-          overlay.removeEventListener("click", handleOverlayClick);
         }, 300);
       };
-  
-      const handleOverlayClick = (e) => {
+
+      document.getElementById("dashboardLink").addEventListener("click", () => {
+        closePopup();
+        const locationId = getLocationIdFromUrl();
+        if (locationId) {
+          const baseUrl = window.location.hostname.includes("konnectd.io")
+            ? "https://app.konnectd.io"
+            : "https://app.gohighlevel.com";
+          const dashboardUrl =
+            baseUrl + "/v2/location/" + locationId + "/dashboard";
+          window.open(dashboardUrl, "_blank");
+        }
+      });
+
+      overlay.addEventListener("click", (e) => {
         if (e.target === overlay) {
           closePopup();
         }
-      };
-  
-      overlay.addEventListener("click", handleOverlayClick);
+      });
       document
         .getElementById("successPopupOk")
         .addEventListener("click", closePopup);
-  
-      const handleKeydown = (e) => {
+
+      document.addEventListener("keydown", function handleKey(e) {
         if (e.key === "Enter" || e.key === "Escape") {
           closePopup();
-          document.removeEventListener("keydown", handleKeydown);
+          document.removeEventListener("keydown", handleKey);
         }
-      };
-      document.addEventListener("keydown", handleKeydown);
-  
-      if (autoClose) {
-        setTimeout(() => {
-          if (document.body.contains(overlay)) {
-            closePopup();
-          }
-        }, 4000);
-      }
+      });
     }
-  
+
     async function updateCustomFields(contactId, fields) {
       const token = await tokenPromise;
       const requestData = {
@@ -2062,7 +2073,7 @@
           },
         ],
       };
-  
+
       const response = await fetch(
         `https://services.leadconnectorhq.com/contacts/${contactId}`,
         {
@@ -2075,10 +2086,10 @@
           body: JSON.stringify(requestData),
         }
       );
-  
+
       return await response.json();
     }
-  
+
     function sendToFlask(
       contactIds,
       rate,
@@ -2092,13 +2103,13 @@
       )}&rate=${encodeURIComponent(rate)}&mortgageType=${encodeURIComponent(
         mortgageType
       )}&alertType=${encodeURIComponent(alertType)}`;
-  
+
       fetch(flaskUrl)
         .then((res) => res.json())
         .then((data) => console.log("Flask Response:", data))
         .catch((err) => console.error("Flask Error:", err));
     }
-  
+
     async function showPopup3(contactIds, singleContactDetails = null) {
       console.log("🚀 SHOWPOPUP3 CALLED");
       console.log("📍 Contact IDs:", contactIds);
@@ -2115,38 +2126,38 @@
         "📋 Is singleContactDetails undefined?:",
         singleContactDetails === undefined
       );
-  
+
       try {
         console.log("🔄 Fetching mortgage rates...");
         const awsNationalRate = await getMortgageRates();
         console.log("📋 AWS National Rate:", awsNationalRate);
-  
+
         if (!awsNationalRate) {
           console.error("❌ Failed to fetch current mortgage rates");
           alert("Failed to fetch current mortgage rates.");
           return;
         }
-  
+
         const parseRate = (rateStr) => {
           if (!rateStr || rateStr === "--") return null;
           return parseFloat(rateStr.replace("%", ""));
         };
-  
+
         const awsConformingRate =
           parseRate(awsNationalRate["30_yr_conforming"]) || "--";
         const awsFHARate = parseRate(awsNationalRate["30_yr_fha"]) || "--";
         const awsVARate = parseRate(awsNationalRate["30_yr_va"]) || "--";
-  
+
         const ratesObject = {
           Conforming: awsConformingRate,
           Fha: awsFHARate,
           Va: awsVARate,
         };
-  
+
         console.log("🔄 Fetching custom fields for location:", locationId1);
         const customFieldsfrombackend = await fetchCustomFields(locationId1);
         console.log("📋 Custom fields from backend:", customFieldsfrombackend);
-  
+
         if (!customFieldsfrombackend || !customFieldsfrombackend.customFields) {
           console.error(
             "❌ Failed to fetch custom fields or customFields missing"
@@ -2155,19 +2166,19 @@
           alert("Failed to fetch custom fields.");
           return;
         }
-  
+
         console.log("🔍 Looking for interest rate field...");
         const interestRateField = customFieldsfrombackend.customFields.find(
           (field) => field.fieldKey === "contact.interest_rate"
         );
         console.log("📋 Interest rate field:", interestRateField);
-  
+
         console.log("🔍 Looking for target rate field...");
         const targetRateField = customFieldsfrombackend.customFields.find(
           (field) => field.fieldKey === "contact.target_rate"
         );
         console.log("📋 Target rate field:", targetRateField);
-  
+
         let customerData;
         if (singleContactDetails) {
           console.log("🔄 Processing single contact details...");
@@ -2175,10 +2186,10 @@
             "📋 singleContactDetails keys:",
             Object.keys(singleContactDetails)
           );
-  
+
           // More flexible contact extraction
           let contact = null;
-  
+
           // Try different ways to get the contact object
           if (singleContactDetails.contact) {
             console.log("📋 Found contact via .contact property");
@@ -2206,24 +2217,24 @@
             alert("Invalid contact details: could not find contact object.");
             return;
           }
-  
+
           console.log("📋 Extracted contact object:", contact);
           console.log("📋 Contact object keys:", Object.keys(contact));
-  
+
           if (!contact.id) {
             console.error("❌ Contact missing 'id' property:", contact);
             console.error("❌ Contact keys:", Object.keys(contact));
             alert("Contact ID is missing from contact details.");
             return;
           }
-  
+
           console.log("✅ Contact ID found:", contact.id);
-  
+
           const firstName = contact.firstName || "";
           const lastName = contact.lastName || "";
           const name = `${firstName} ${lastName}`.trim() || "Unknown Contact";
           console.log("📋 Contact name:", name);
-  
+
           if (!interestRateField) {
             console.error("❌ Interest rate field not found in custom fields");
           } else {
@@ -2232,7 +2243,7 @@
               interestRateField.id
             );
           }
-  
+
           if (!targetRateField) {
             console.error("❌ Target rate field not found in custom fields");
           } else {
@@ -2241,7 +2252,7 @@
               targetRateField.id
             );
           }
-  
+
           console.log("📋 Contact custom fields:", contact.customFields);
           console.log(
             "📋 Contact custom fields type:",
@@ -2251,27 +2262,27 @@
             "📋 Contact custom fields is array:",
             Array.isArray(contact.customFields)
           );
-  
+
           const rateField = contact.customFields?.find(
             (field) => field.id === interestRateField?.id
           );
           console.log("📋 Found rate field:", rateField);
-  
+
           const targetrateField = contact.customFields?.find(
             (field) => field.id === targetRateField?.id
           );
           console.log("📋 Found target rate field:", targetrateField);
-  
+
           const rate = rateField?.value
             ? parseFloat(rateField.value).toFixed(3)
             : "--";
           console.log("📋 Processed rate:", rate);
-  
+
           const targetRateofContact = targetrateField?.value
             ? parseFloat(targetrateField.value).toFixed(3)
             : "--";
           console.log("📋 Processed target rate:", targetRateofContact);
-  
+
           customerData = [{ name, rate, targetRateofContact }];
           console.log("📋 Final customer data:", customerData);
         } else {
@@ -2280,20 +2291,20 @@
           );
           customerData = [];
         }
-  
+
         const targetRate = await createGHLCustomModal(
           `You'll be notified when the national average drops to or below your selected target.`,
           ratesObject,
           customerData
         );
-  
+
         if (targetRate === null) return;
-  
+
         const adjustment = targetRate.adjustment?.trim() || "";
-  
+
         const newOption = targetRate.mortgageType || "Conforming";
         let awsaverageRates;
-  
+
         if (newOption === "Conforming") {
           awsaverageRates = awsConformingRate;
         } else if (newOption === "Fha") {
@@ -2304,24 +2315,24 @@
           alert("Please select a valid mortgage type.");
           return;
         }
-  
+
         const flaskRate =
           newOption === "Conforming"
             ? "30_Yr_Conforming"
             : newOption === "Fha"
             ? "30_Yr_FHA"
             : "30_Yr_VA";
-  
+
         const awsNational = awsaverageRates;
         let optimalTargetValue;
         let alertType = targetRate.alertType || "target";
-  
+
         // if (alertType === "target") {
         //   optimalTargetValue = parseFloat(targetRate.rate);
         // } else {
         //   const dropAmount = parseFloat(targetRate.dropAmount);
         //   const contactCurrentInterestRate = parseFloat(customerData[0].rate);
-  
+
         //   if (
         //     isNaN(contactCurrentInterestRate) ||
         //     contactCurrentInterestRate === 0
@@ -2331,17 +2342,17 @@
         //     );
         //     return;
         //   }
-  
+
         //   optimalTargetValue = contactCurrentInterestRate - dropAmount;
         // }
-  
+
         console.log(
           "---------------------->>>>>>>",
           customerData[0],
           customerData[0].rate,
           targetRate
         );
-  
+
         if (alertType === "target") {
           optimalTargetValue = parseFloat(targetRate.rate);
           if (adj) {
@@ -2354,7 +2365,7 @@
         } else {
           const dropAmount = parseFloat(targetRate.dropAmount);
           const contactCurrentInterestRate = parseFloat(customerData[0].rate);
-  
+
           if (
             isNaN(contactCurrentInterestRate) ||
             contactCurrentInterestRate === 0
@@ -2364,23 +2375,23 @@
             );
             return;
           }
-  
+
           optimalTargetValue = contactCurrentInterestRate - dropAmount;
         }
-  
+
         // if (isNaN(optimalTargetValue)) {
         //   alert("Please provide a valid value.");
         //   return;
         // }
-  
+
         //console all of this
-  
+
         console.log("Contact IDs:", contactIds);
         console.log("Optimal Target Value:", optimalTargetValue);
         console.log("Flask Rate:", flaskRate);
         console.log("Alert Type:", alertType);
         console.log("Adjustment:", adjustment);
-  
+
         // Send to Flask and update contacts
         sendToFlask(
           contactIds,
@@ -2389,7 +2400,7 @@
           alertType,
           adjustment
         );
-  
+
         await Promise.all(
           contactIds.map((id) =>
             updateCustomFields(id, {
@@ -2400,7 +2411,7 @@
             })
           )
         );
-  
+
         showSuccessPopup();
       } catch (error) {
         console.error("❌ SHOWPOPUP3 ERROR:", error);
@@ -2415,13 +2426,13 @@
         alert("Failed to set alert: " + error.message);
       }
     }
-  
+
     function extractContactData(contactDetails, customFields) {
       if (!contactDetails?.contact || !customFields?.customFields) return null;
-  
+
       const contact = contactDetails.contact;
       const fields = customFields.customFields;
-  
+
       const loanAmountField = fields.find(
         (f) =>
           f.fieldKey === "contact.loan_amount" ||
@@ -2438,7 +2449,10 @@
           f.fieldKey === "contact.interest_rate" ||
           f.name?.toLowerCase().includes("interest rate")
       );
-  
+      const fundedDateField = fields.find(
+        (f) => f.fieldKey === "contact.loan_funded"
+      );
+
       const loanAmountValue = contact.customFields?.find(
         (f) => f.id === loanAmountField?.id
       )?.value;
@@ -2448,18 +2462,22 @@
       const interestRateValue = contact.customFields?.find(
         (f) => f.id === interestRateField?.id
       )?.value;
-  
+      const fundedDateValue = contact.customFields?.find(
+        (f) => f.id === fundedDateField?.id
+      )?.value;
+
       return {
         loanAmount: loanAmountValue || "",
         loanTerm: loanTermValue || "",
         interestRate: interestRateValue || "",
+        fundedDate: fundedDateValue || "",
       };
     }
-  
+
     // ====== ON DEMAND REFINANCE POPUP FUNCTION ======
     async function showOnDemandRefiPopup(contactData = null) {
       if (document.getElementById("on-demand-refi-popup")) return;
-  
+
       // Create overlay
       const overlay = document.createElement("div");
       overlay.id = "on-demand-refi-popup";
@@ -2477,7 +2495,7 @@
       overlay.style.padding = "20px";
       overlay.style.boxSizing = "border-box";
       document.body.appendChild(overlay);
-  
+
       // Add CSS animation
       const style = document.createElement("style");
       style.textContent = `
@@ -2511,7 +2529,7 @@
         }
       `;
       document.head.appendChild(style);
-  
+
       // Create popup
       const popup = document.createElement("div");
       popup.style.position = "fixed";
@@ -2533,7 +2551,7 @@
       popup.style.overflow = "hidden";
       popup.style.animation = "slideInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1)";
       popup.style.border = "1px solid rgba(255,255,255,0.2)";
-  
+
       popup.innerHTML = `
         <div style="padding: 40px; max-height: 90vh; overflow-y: auto; box-sizing: border-box;">
           <h2 style="
@@ -2661,6 +2679,33 @@
                   placeholder="0.00"
                   onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode === 46"
                   onfocus="this.style.borderColor='#667eea'; this.style.background='#ffffff'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
+                  onblur="this.style.borderColor='#e5e7eb'; this.style.background='#ffffff'; this.style.boxShadow='none'"
+                >
+              </div>
+              
+              <!-- Funded Date -->
+              <div>
+                <label style="
+                  display: block; 
+                  margin-bottom: 8px; 
+                  color: #374151; 
+                  font-weight: 600;
+                  font-size: 14px;
+                ">Funded Date</label>
+                <input type="date" id="fundedDate" 
+                  style="
+                    width: 100%; 
+                    padding: 14px 16px; 
+                    border: 2px solid #e5e7eb; 
+                    border-radius: 12px; 
+                    font-size: 16px;
+                    font-weight: 600;
+                    background: #ffffff;
+                    color: #1f2937;
+                    transition: all 0.3s ease;
+                    box-sizing: border-box;
+                  " 
+                  onfocus="this.style.borderColor='#667eea'; this.style.background='#ffffff'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'; this.showPicker && this.showPicker();"
                   onblur="this.style.borderColor='#e5e7eb'; this.style.background='#ffffff'; this.style.boxShadow='none'"
                 >
               </div>
@@ -3087,17 +3132,18 @@
           </div>
         </div>
       `;
-  
+
       overlay.appendChild(popup);
       document.body.appendChild(overlay);
-  
+
       // Prefill values after DOM is created
       if (contactData) {
         setTimeout(() => {
           const loanAmountEl = document.getElementById("currentLoanAmount");
           const termEl = document.getElementById("currentTerm");
           const rateEl = document.getElementById("currentLoanRate");
-  
+          const fundedDateEl = document.getElementById("fundedDate");
+
           if (contactData.loanAmount && loanAmountEl) {
             loanAmountEl.value = contactData.loanAmount;
             loanAmountEl.dispatchEvent(new Event("input", { bubbles: true }));
@@ -3108,9 +3154,12 @@
           if (contactData.interestRate && rateEl) {
             rateEl.value = contactData.interestRate;
           }
+          if (contactData.fundedDate && fundedDateEl) {
+            fundedDateEl.value = contactData.fundedDate;
+          }
         }, 100);
       }
-  
+
       // Add event listeners for closing costs toggle
       const closingCostHeader = document.getElementById("closingCostHeader");
       const closingCostBreakdown = document.getElementById(
@@ -3120,7 +3169,7 @@
         "closingCostToggleIcon"
       );
       const closingCostTotal = document.getElementById("closingCostTotal");
-  
+
       // Function to calculate and update total
       const updateClosingCostTotal = () => {
         const processing =
@@ -3137,7 +3186,7 @@
           maximumFractionDigits: 2,
         });
       };
-  
+
       // Add input listeners for real-time calculation
       [
         "processingInput",
@@ -3149,7 +3198,7 @@
           .getElementById(id)
           .addEventListener("input", updateClosingCostTotal);
       });
-  
+
       // Toggle closing costs breakdown
       closingCostHeader.addEventListener("click", () => {
         const isVisible = closingCostBreakdown.style.display !== "none";
@@ -3157,14 +3206,14 @@
         const arrow = closingCostToggleIcon.querySelector("span");
         arrow.style.transform = isVisible ? "rotate(0deg)" : "rotate(180deg)";
       });
-  
+
       // Lender credit toggle functionality
       const dollarToggle = document.getElementById("lenderToggleDollar");
       const percentToggle = document.getElementById("lenderTogglePercent");
       const lenderInput = document.getElementById("lenderCreditInput");
       const lenderSuffix = document.getElementById("lenderSuffix");
       const lenderSubtext = document.getElementById("lenderCreditSubtext");
-  
+
       dollarToggle.addEventListener("click", () => {
         dollarToggle.style.background =
           "linear-gradient(135deg, #667eea, #764ba2)";
@@ -3174,25 +3223,25 @@
         lenderSuffix.textContent = "$";
         lenderSubtext.style.display = "none";
       });
-  
+
       // Function to update the subtext based on percentage and loan amount
       const updateLenderCreditSubtext = () => {
         if (lenderSuffix.textContent !== "%") {
           lenderSubtext.style.display = "none";
           return;
         }
-  
+
         const percentValue = parseFloat(lenderInput.value) || 0;
         const loanAmountValue =
           parseFloat(
             document.getElementById("currentLoanAmount").value.replace(/,/g, "")
           ) || 0;
-  
+
         if (percentValue === 0 || loanAmountValue === 0) {
           lenderSubtext.style.display = "none";
           return;
         }
-  
+
         const dollarValue = loanAmountValue * (percentValue / 100);
         const formattedDollarValue = Math.abs(dollarValue).toLocaleString(
           "en-US",
@@ -3201,7 +3250,7 @@
             maximumFractionDigits: 2,
           }
         );
-  
+
         lenderSubtext.style.display = "block";
         if (percentValue < 0) {
           lenderSubtext.textContent = `Credit: ≈ $${formattedDollarValue}`;
@@ -3211,7 +3260,7 @@
           lenderSubtext.style.color = "#ef4444";
         }
       };
-  
+
       dollarToggle.addEventListener("click", () => {
         dollarToggle.style.background =
           "linear-gradient(135deg, #667eea, #764ba2)";
@@ -3221,7 +3270,7 @@
         lenderSuffix.textContent = "$";
         lenderSubtext.style.display = "none";
       });
-  
+
       percentToggle.addEventListener("click", () => {
         percentToggle.style.background =
           "linear-gradient(135deg, #667eea, #764ba2)";
@@ -3231,13 +3280,13 @@
         lenderSuffix.textContent = "%";
         updateLenderCreditSubtext();
       });
-  
+
       // Add input listeners for live updates
       lenderInput.addEventListener("input", updateLenderCreditSubtext);
       document
         .getElementById("currentLoanAmount")
         .addEventListener("input", updateLenderCreditSubtext);
-  
+
       // Close popup functionality
       const closePopup = () => {
         if (document.body.contains(overlay)) {
@@ -3247,7 +3296,7 @@
           document.head.removeChild(style);
         }
       };
-  
+
       document
         .getElementById("cancelOnDemand")
         .addEventListener("click", closePopup);
@@ -3257,24 +3306,31 @@
           // Validate required fields
           const newRate = document.getElementById("newRate").value.trim();
           const newTerm = document.getElementById("newTerm").value.trim();
-  
+          const fundedDate = document.getElementById("fundedDate").value.trim();
+
           if (!newRate) {
             alert("Please enter a New Rate");
             document.getElementById("newRate").focus();
             return;
           }
-  
+
           if (!newTerm) {
             alert("Please enter a New Term");
             document.getElementById("newTerm").focus();
             return;
           }
-  
+
+          if (!fundedDate) {
+            alert("Please enter a Funded Date");
+            document.getElementById("fundedDate").focus();
+            return;
+          }
+
           // Show loading state
           const generateBtn = document.getElementById("generateOnDemandBtn");
           generateBtn.textContent = "Generating...";
           generateBtn.disabled = true;
-  
+
           // Collect closing cost breakdown
           const closingCostData = {
             total:
@@ -3308,7 +3364,7 @@
                 ) || 0,
             },
           };
-  
+
           // Collect lender credit
           const lenderSuffix =
             document.getElementById("lenderSuffix").textContent;
@@ -3322,7 +3378,7 @@
               ) || 0,
             isPercentage: isPercentage,
           };
-  
+
           // Get contact ID from current page
           const contactId =
             getContactIdFromUrl() || getContactIdFromConversationGlobal();
@@ -3332,7 +3388,7 @@
             generateBtn.disabled = false;
             return;
           }
-  
+
           // Get contact details
           let contactDetails;
           try {
@@ -3347,12 +3403,12 @@
             generateBtn.disabled = false;
             return;
           }
-  
+
           const contact = contactDetails.contact;
           const selectedContact = contact;
-  
+
           const locationIdRef = getLocationIdFromUrl();
-  
+
           // Prepare request data (same format as ref.html)
           const requestData = {
             location_id: locationIdRef,
@@ -3371,14 +3427,16 @@
               current_loan_amount:
                 document.getElementById("currentLoanAmount").value,
               current_term: document.getElementById("currentTerm").value,
-              current_loan_rate: document.getElementById("currentLoanRate").value,
+              current_loan_rate:
+                document.getElementById("currentLoanRate").value,
+              fundedDate: document.getElementById("fundedDate").value,
               new_rate: document.getElementById("newRate").value,
               new_term: document.getElementById("newTerm").value,
             },
           };
-  
+
           console.log("Complete Request Data:", requestData);
-  
+
           // Make API call (same as ref.html)
           try {
             const response = await fetch(
@@ -3391,14 +3449,16 @@
                 body: JSON.stringify(requestData),
               }
             );
-  
+
             if (!response.ok) {
-              throw new Error(`Server responded with status ${response.status}`);
+              throw new Error(
+                `Server responded with status ${response.status}`
+              );
             }
-  
+
             const result = await response.json();
             console.log("API Response:", result);
-  
+
             // Show success popup (same as ref.html)
             const popup = document.querySelector("#on-demand-refi-popup div");
             popup.innerHTML = `
@@ -3423,7 +3483,7 @@
                 </button>
               </div>
             `;
-  
+
             // Add event listener to open report
             document
               .getElementById("closeSuccessPopup")
@@ -3459,7 +3519,7 @@
                 </button>
               </div>
             `;
-  
+
             // Add event listener to try again
             document
               .getElementById("closeErrorPopup")
@@ -3481,14 +3541,14 @@
               });
           }
         });
-  
+
       // Close on overlay click
       overlay.addEventListener("click", (e) => {
         if (e.target === overlay) {
           closePopup();
         }
       });
-  
+
       // Close on Escape key
       const handleEscape = (e) => {
         if (e.key === "Escape") {
@@ -3498,7 +3558,7 @@
       };
       document.addEventListener("keydown", handleEscape);
     }
-  
+
     //
     // ========== OLD: Refi Analysis modal + helper (keeping for reference) ==========
     //
@@ -3509,7 +3569,7 @@
           alert("No contact selected for Refi Analysis.");
           return;
         }
-  
+
         // ensure we have contact details
         let contactDetails = singleContactDetails;
         if (!contactDetails) {
@@ -3519,13 +3579,13 @@
             return;
           }
         }
-  
+
         const customFieldsFromBackend = await fetchCustomFields(locationId1);
         if (!customFieldsFromBackend || !customFieldsFromBackend.customFields) {
           alert("Failed to fetch custom fields.");
           return;
         }
-  
+
         // try to find some common fields (fall back gracefully)
         const interestRateFieldDef = customFieldsFromBackend.customFields.find(
           (f) => f.fieldKey === "contact.interest_rate"
@@ -3533,42 +3593,44 @@
         const mortgageFieldDef = customFieldsFromBackend.customFields.find(
           (f) => f.fieldKey === "contact.mortgage_type"
         );
-  
+
         // read values from contact details
         const contact = contactDetails.contact || contactDetails;
         const firstName = contact.firstName || "";
         const lastName = contact.lastName || "";
         const fullName = `${firstName} ${lastName}`.trim();
-  
+
         const rateField =
-          contact.customFields?.find((f) => f.id === interestRateFieldDef?.id) ||
+          contact.customFields?.find(
+            (f) => f.id === interestRateFieldDef?.id
+          ) ||
           contact.customFields?.find(
             (f) => f.fieldKey === "contact.interest_rate"
           );
         const existingRate = rateField?.value
           ? parseFloat(rateField.value).toFixed(3)
           : "";
-  
+
         const mortgageField =
           contact.customFields?.find((f) => f.id === mortgageFieldDef?.id) ||
           contact.customFields?.find(
             (f) => f.fieldKey === "contact.mortgage_type"
           );
         const existingMortgage = mortgageField?.value || "";
-  
+
         // Build a simple modal (keeps styling consistent with other modal)
         const overlay = document.createElement("div");
         overlay.style.cssText = `
           position: fixed; inset: 0; background: rgba(0,0,0,0.65);
           display:flex; align-items:center; justify-content:center; z-index:99999;
         `;
-  
+
         const modal = document.createElement("div");
         modal.style.cssText = `
           width:520px; max-width:94vw; border-radius:12px; background: #fff;
           box-shadow:0 20px 40px rgba(2,6,23,0.4); overflow:hidden; font-family:Inter, system-ui, sans-serif;
         `;
-  
+
         modal.innerHTML = `
           <div style="background:linear-gradient(135deg,#667eea,#764ba2); padding:18px 20px; color:white;">
             <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -3602,73 +3664,79 @@
             </div>
           </div>
         `;
-  
+
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
-  
+
         const cleanup = () => {
-          if (document.body.contains(overlay)) document.body.removeChild(overlay);
+          if (document.body.contains(overlay))
+            document.body.removeChild(overlay);
         };
-  
+
         document
           .getElementById("refiCloseBtn")
           .addEventListener("click", cleanup);
-        document.getElementById("refiCancel").addEventListener("click", cleanup);
-  
-        document.getElementById("refiRun").addEventListener("click", async () => {
-          const currentRate = document.getElementById("refiCurrentRate").value;
-          const mortgageType =
-            document.getElementById("refiMortgageType").value || "Conforming";
-          const loanBalance =
-            document.getElementById("refiLoanBalance").value || "";
-  
-          if (!currentRate) {
-            alert(
-              "Please provide the borrower's current interest rate (or prefill from contact)."
-            );
-            return;
-          }
-  
-          // call the same Flask back-end pattern - endpoint for refi analysis
-          const flaskUrl = `https://api.konnectd.io/refi-analysis?location_id=${locationId1}&contactIds=${encodeURIComponent(
-            contactIds.join(",")
-          )}&currentRate=${encodeURIComponent(
-            currentRate
-          )}&mortgageType=${encodeURIComponent(
-            mortgageType
-          )}&loanBalance=${encodeURIComponent(loanBalance)}`;
-  
-          try {
-            const res = await fetch(flaskUrl);
-            const data = await res.json();
-            console.log("Refi analysis response:", data);
-            showSuccessPopup(
-              "Refi analysis requested. Check results in your dashboard or notification area."
-            );
-          } catch (err) {
-            console.error("Refi analysis error:", err);
-            alert("Failed to run refi analysis.");
-          } finally {
-            cleanup();
-          }
-        });
+        document
+          .getElementById("refiCancel")
+          .addEventListener("click", cleanup);
+
+        document
+          .getElementById("refiRun")
+          .addEventListener("click", async () => {
+            const currentRate =
+              document.getElementById("refiCurrentRate").value;
+            const mortgageType =
+              document.getElementById("refiMortgageType").value || "Conforming";
+            const loanBalance =
+              document.getElementById("refiLoanBalance").value || "";
+
+            if (!currentRate) {
+              alert(
+                "Please provide the borrower's current interest rate (or prefill from contact)."
+              );
+              return;
+            }
+
+            // call the same Flask back-end pattern - endpoint for refi analysis
+            const flaskUrl = `https://api.konnectd.io/refi-analysis?location_id=${locationId1}&contactIds=${encodeURIComponent(
+              contactIds.join(",")
+            )}&currentRate=${encodeURIComponent(
+              currentRate
+            )}&mortgageType=${encodeURIComponent(
+              mortgageType
+            )}&loanBalance=${encodeURIComponent(loanBalance)}`;
+
+            try {
+              const res = await fetch(flaskUrl);
+              const data = await res.json();
+              console.log("Refi analysis response:", data);
+              showSuccessPopup(
+                "Refi analysis requested. Check results in your dashboard or notification area."
+              );
+            } catch (err) {
+              console.error("Refi analysis error:", err);
+              alert("Failed to run refi analysis.");
+            } finally {
+              cleanup();
+            }
+          });
       } catch (err) {
         console.error("showRefiAnalysis error:", err);
         alert("Error opening Refi Analysis.");
       }
     }
-  
+
     // ==========================================
     // CONTACT DETAIL PAGE LOGIC
     // ==========================================
-  
+
     if (isContactDetailPage) {
       console.log("DEBUG: Initializing Contact Detail Page injection");
-  
+
       let observers = [];
       let cleanupIntervals = [];
       let urlCheckIntervalId = null;
-  
+
       function cleanupTargetRateSystem() {
         console.log("DEBUG: 🧹 Cleaning up target rate system");
         const buttonContainer = document.getElementById(
@@ -3687,28 +3755,30 @@
           (id) => id && id !== urlCheckIntervalId
         );
       }
-  
+
       function shouldInitialize() {
         const contactId = getContactIdFromUrl();
         return !!contactId;
       }
-  
+
       function injectTargetRateButton() {
         const targetDiv = document.querySelector(
           ".hr-tabs-nav--segment-type.hr-tabs-nav--top.hr-tabs-nav"
         );
-  
+
         if (!targetDiv) {
           console.log("DEBUG: Tabs div not found yet");
           return false;
         }
-  
+
         if (!getContactIdFromUrl()) {
-          console.log("DEBUG: ❌ No longer on contact page - aborting injection");
+          console.log(
+            "DEBUG: ❌ No longer on contact page - aborting injection"
+          );
           cleanupTargetRateSystem();
           return false;
         }
-  
+
         // Remove any existing buttons to prevent duplicates
         const existingContainer = document.getElementById(
           "dashboard-target-rate-container"
@@ -3719,11 +3789,11 @@
             "DEBUG: Removed existing button container to prevent duplicate"
           );
         }
-  
+
         console.log(
           "DEBUG: Creating target rate + refi buttons for contact detail page"
         );
-  
+
         const buttonContainer = document.createElement("div");
         buttonContainer.id = "dashboard-target-rate-container";
         buttonContainer.style.cssText = `
@@ -3734,7 +3804,7 @@
                       gap: 8px;
                       align-items: center;
                     `;
-  
+
         // Left button: Set Target Rate
         const leftBtn = document.createElement("button");
         leftBtn.id = "dashboard-target-rate-button";
@@ -3755,7 +3825,7 @@
                       box-shadow: 0 2px 6px rgba(0,123,255,0.3);
                       white-space: nowrap;
                     `;
-  
+
         leftBtn.addEventListener("mouseenter", () => {
           leftBtn.style.transform = "translateY(-2px)";
           leftBtn.style.boxShadow = "0 4px 10px rgba(0, 123, 255, 0.5)";
@@ -3764,14 +3834,14 @@
           leftBtn.style.transform = "translateY(0)";
           leftBtn.style.boxShadow = "0 2px 6px rgba(0, 123, 255, 0.3)";
         });
-  
+
         leftBtn.addEventListener("click", async function () {
           const currentContactId = getContactIdFromUrl();
           if (!currentContactId) {
             alert("No contact ID found - please refresh the page.");
             return;
           }
-  
+
           try {
             const contactDetails = await fetchContactDetails(currentContactId);
             if (!contactDetails) {
@@ -3785,7 +3855,7 @@
             alert("Error loading contact details.");
           }
         });
-  
+
         // Right button: Refi Analysis
         const rightBtn = document.createElement("button");
         rightBtn.id = "dashboard-refi-analysis-button";
@@ -3806,7 +3876,7 @@
                       box-shadow: 0 2px 6px rgba(16,185,129,0.3);
                       white-space: nowrap;
                     `;
-  
+
         rightBtn.addEventListener("mouseenter", () => {
           rightBtn.style.transform = "translateY(-2px)";
           rightBtn.style.boxShadow = "0 4px 10px rgba(16,185,129,0.45)";
@@ -3815,7 +3885,7 @@
           rightBtn.style.transform = "translateY(0)";
           rightBtn.style.boxShadow = "0 2px 6px rgba(16,185,129,0.3)";
         });
-  
+
         // rightBtn.addEventListener("click", async function () {
         //   const currentContactId = getContactIdFromUrl();
         //   if (!currentContactId) {
@@ -3841,7 +3911,7 @@
             alert("No contact ID found - please refresh the page.");
             return;
           }
-  
+
           // Show loading state
           const originalText = rightBtn.innerHTML;
           rightBtn.innerHTML =
@@ -3849,18 +3919,24 @@
           rightBtn.disabled = true;
           rightBtn.style.opacity = "0.7";
           rightBtn.style.cursor = "wait";
-  
+
           try {
-            console.log("DEBUG: Fetching contact details for:", currentContactId);
+            console.log(
+              "DEBUG: Fetching contact details for:",
+              currentContactId
+            );
             const contactDetails = await fetchContactDetails(currentContactId);
             console.log("DEBUG: Contact details fetched:", contactDetails);
-  
+
             const customFields = await fetchCustomFields(locationId1);
             console.log("DEBUG: Custom fields fetched:", customFields);
-  
-            const contactData = extractContactData(contactDetails, customFields);
+
+            const contactData = extractContactData(
+              contactDetails,
+              customFields
+            );
             console.log("DEBUG: Contact data extracted:", contactData);
-  
+
             showOnDemandRefiPopup(contactData);
           } catch (error) {
             console.error("Error fetching contact data:", error);
@@ -3877,14 +3953,16 @@
         buttonContainer.appendChild(leftBtn);
         buttonContainer.appendChild(rightBtn);
         targetDiv.parentNode.insertBefore(buttonContainer, targetDiv);
-  
-        console.log("DEBUG: ✅ Target rate + Refi buttons injected successfully");
+
+        console.log(
+          "DEBUG: ✅ Target rate + Refi buttons injected successfully"
+        );
         return true;
       }
-  
+
       //   function setupUrlChangeDetection() {
       //     let lastUrl = window.location.href;
-  
+
       //     const checkUrlChange = () => {
       //       const currentUrl = window.location.href;
       //       if (currentUrl !== lastUrl) {
@@ -3910,15 +3988,15 @@
       //         }, 100);
       //       }
       //     };
-  
+
       //     urlCheckIntervalId = setInterval(checkUrlChange, 500);
-  
+
       //     const handlePopState = () => {
       //       console.log("DEBUG: 🔙 Popstate detected");
       //       setTimeout(checkUrlChange, 100);
       //     };
       //     window.addEventListener("popstate", handlePopState);
-  
+
       //     window.addEventListener("beforeunload", () => {
       //       window.removeEventListener("popstate", handlePopState);
       //       if (urlCheckIntervalId) {
@@ -3927,21 +4005,26 @@
       //       }
       //     });
       //   }
-  
+
       function setupUrlChangeDetection() {
         let lastUrl = window.location.href;
-  
+
         const checkUrlChange = () => {
           const currentUrl = window.location.href;
           if (currentUrl !== lastUrl) {
-            console.log("DEBUG: 🔄 URL changed from", lastUrl, "to", currentUrl);
-  
+            console.log(
+              "DEBUG: 🔄 URL changed from",
+              lastUrl,
+              "to",
+              currentUrl
+            );
+
             // Only handle URL changes if we're still on a contact detail page
             const wasContactDetail = lastUrl.includes("/detail/");
             const isContactDetail = currentUrl.includes("/detail/");
-  
+
             lastUrl = currentUrl;
-  
+
             // Only cleanup and reinitialize if we're navigating between contact detail pages
             if (wasContactDetail && isContactDetail) {
               console.log("DEBUG: 🔄 Navigating between contact pages");
@@ -3954,7 +4037,9 @@
               }, 100);
             } else if (wasContactDetail && !isContactDetail) {
               // Leaving contact detail page - cleanup only
-              console.log("DEBUG: 🚪 Leaving contact detail page - cleaning up");
+              console.log(
+                "DEBUG: 🚪 Leaving contact detail page - cleaning up"
+              );
               cleanupTargetRateSystem();
               // Stop the URL monitoring since we're leaving
               if (urlCheckIntervalId) {
@@ -3964,15 +4049,15 @@
             }
           }
         };
-  
+
         urlCheckIntervalId = setInterval(checkUrlChange, 500);
-  
+
         const handlePopState = () => {
           console.log("DEBUG: 🔙 Popstate detected");
           setTimeout(checkUrlChange, 100);
         };
         window.addEventListener("popstate", handlePopState);
-  
+
         window.addEventListener("beforeunload", () => {
           window.removeEventListener("popstate", handlePopState);
           if (urlCheckIntervalId) {
@@ -3981,11 +4066,13 @@
           }
         });
       }
-  
+
       function initializeContactDetailSystem() {
         if (!injectTargetRateButton()) {
-          console.log("DEBUG: Initial injection failed, setting up observer...");
-  
+          console.log(
+            "DEBUG: Initial injection failed, setting up observer..."
+          );
+
           const tabObserver = new MutationObserver(function (mutations) {
             for (const mutation of mutations) {
               if (mutation.addedNodes.length) {
@@ -4010,13 +4097,13 @@
               }
             }
           });
-  
+
           tabObserver.observe(document.body, {
             childList: true,
             subtree: true,
           });
           observers.push(tabObserver);
-  
+
           let retryCount = 0;
           const intervalId = setInterval(() => {
             retryCount++;
@@ -4034,32 +4121,34 @@
           cleanupIntervals.push(intervalId);
         }
       }
-  
+
       if (shouldInitialize()) {
-        console.log("DEBUG: ✅ Contact detail page detected - injecting button");
+        console.log(
+          "DEBUG: ✅ Contact detail page detected - injecting button"
+        );
         initializeContactDetailSystem();
         setupPaymentButtonHiding();
       }
       setupUrlChangeDetection();
     }
-  
+
     // ==========================================
     // CONVERSATIONS PAGE LOGIC
     // ==========================================
-  
+
     if (isConversationsPage) {
       console.log("DEBUG: Initializing Conversations Page injection");
-  
+
       let currentContactId = null;
       let conversationObserver = null;
-  
+
       function getContactIdFromConversation() {
         // Try multiple methods to get contact ID
         const conversationElement = document.querySelector("[contactid]");
         if (conversationElement) {
           return conversationElement.getAttribute("contactid");
         }
-  
+
         // Try from URL if conversation is selected
         const urlMatch = window.location.href.match(
           /conversations\/[^\/]+\/([a-zA-Z0-9]+)/
@@ -4067,49 +4156,49 @@
         if (urlMatch) {
           return urlMatch[1];
         }
-  
+
         return null;
       }
-  
+
       function setupContactClickHandler() {
         const conversationElements = document.querySelectorAll(
           "[data-conversation-id]"
         );
-  
+
         conversationElements.forEach((element) => {
           element.removeEventListener("click", handleConversationClick);
           element.addEventListener("click", handleConversationClick);
         });
       }
-  
+
       function handleConversationClick(event) {
         const contactId = this.getAttribute("contactid");
         const conversationId = this.getAttribute("data-conversation-id");
         const contactName =
           this.getAttribute("contactname") || this.getAttribute("fullname");
-  
+
         console.log("📞 Conversation clicked:", {
           contactId: contactId,
           conversationId: conversationId,
           contactName: contactName,
         });
-  
+
         currentContactId = contactId;
-  
+
         // Re-inject button after contact selection
         setTimeout(() => {
           injectConversationButton();
         }, 500);
       }
-  
+
       function injectConversationButton() {
         // Find the "tabs" area that contains All Fields / DND / Actions
         const allTabs = document.querySelectorAll(
           ".hr-tabs-nav--segment-type.hr-tabs-nav--top.hr-tabs-nav"
         );
-  
+
         let targetTab = null;
-  
+
         // Look for the specific tab that has "All Fields", "DND", "Actions" tabs
         for (const tab of allTabs) {
           const tabLabels = tab.textContent || "";
@@ -4122,18 +4211,18 @@
             break;
           }
         }
-  
+
         if (!targetTab) {
           console.log("DEBUG: Conversation tabs not found yet");
           return false;
         }
-  
+
         // Remove existing container if any
         const existingContainer = document.getElementById(
           "conversation-target-rate-container"
         );
         if (existingContainer) existingContainer.remove();
-  
+
         const buttonContainer = document.createElement("div");
         buttonContainer.id = "conversation-target-rate-container";
         buttonContainer.style.cssText = `
@@ -4144,7 +4233,7 @@
                       gap: 8px;
                       align-items: center;
                     `;
-  
+
         // Left button: Set Target Rate (conversation)
         const leftBtn = document.createElement("button");
         leftBtn.id = "conversation-target-rate-button";
@@ -4165,7 +4254,7 @@
                       box-shadow: 0 2px 6px rgba(0,123,255,0.3);
                       white-space: nowrap;
                     `;
-  
+
         leftBtn.addEventListener("mouseenter", () => {
           leftBtn.style.transform = "translateY(-2px)";
           leftBtn.style.boxShadow = "0 4px 10px rgba(0, 123, 255, 0.5)";
@@ -4174,14 +4263,14 @@
           leftBtn.style.transform = "translateY(0)";
           leftBtn.style.boxShadow = "0 2px 6px rgba(0, 123, 255, 0.3)";
         });
-  
+
         leftBtn.addEventListener("click", async function () {
           const contactId = currentContactId || getContactIdFromConversation();
           if (!contactId) {
             alert("No contact selected. Please select a conversation first.");
             return;
           }
-  
+
           try {
             const contactDetails = await fetchContactDetails(contactId);
             if (!contactDetails) {
@@ -4195,7 +4284,7 @@
             alert("Error loading contact details.");
           }
         });
-  
+
         // Right button: Refi Analysis (conversation)
         const rightBtn = document.createElement("button");
         rightBtn.id = "conversation-refi-analysis-button";
@@ -4216,7 +4305,7 @@
                       box-shadow: 0 2px 6px rgba(16,185,129,0.3);
                       white-space: nowrap;
                     `;
-  
+
         rightBtn.addEventListener("mouseenter", () => {
           rightBtn.style.transform = "translateY(-2px)";
           rightBtn.style.boxShadow = "0 4px 10px rgba(16,185,129,0.45)";
@@ -4225,7 +4314,7 @@
           rightBtn.style.transform = "translateY(0)";
           rightBtn.style.boxShadow = "0 2px 6px rgba(16,185,129,0.3)";
         });
-  
+
         rightBtn.addEventListener("click", async function () {
           const contactId = currentContactId || getContactIdFromConversation();
           if (!contactId) {
@@ -4235,25 +4324,28 @@
           try {
             const contactDetails = await fetchContactDetails(contactId);
             const customFields = await fetchCustomFields(locationId1);
-            const contactData = extractContactData(contactDetails, customFields);
+            const contactData = extractContactData(
+              contactDetails,
+              customFields
+            );
             showOnDemandRefiPopup(contactData);
           } catch (error) {
             console.error("Error fetching contact data:", error);
             showOnDemandRefiPopup();
           }
         });
-  
+
         buttonContainer.appendChild(leftBtn);
         buttonContainer.appendChild(rightBtn);
         targetTab.parentNode.insertBefore(buttonContainer, targetTab);
-  
+
         console.log(
           "DEBUG: ✅ Conversation target rate + Refi buttons injected successfully"
         );
         return true;
       }
     }
-  
+
     // ====== BEGIN: Robust reinjection helpers (fixes needing hard refresh) ======
     // These run irrespective of initial page load and re-insert buttons when routes change.
     function getContactIdFromConversationGlobal() {
@@ -4266,7 +4358,7 @@
         console.log("Found contact ID from active conversation:", contactId);
         return contactId;
       }
-  
+
       // Fallback to any element with contactid attribute
       const el = document.querySelector("[contactid]");
       if (el) {
@@ -4274,7 +4366,7 @@
         console.log("Found contact ID from any element:", contactId);
         return contactId;
       }
-  
+
       // Last resort - try URL pattern
       const urlMatch = window.location.href.match(
         /conversations\/[^\/]+\/([a-zA-Z0-9]+)/
@@ -4283,58 +4375,60 @@
         console.log("Found contact ID from URL:", urlMatch[1]);
         return urlMatch[1];
       }
-  
+
       console.log("No contact ID found");
       return null;
     }
-  
+
     function ensureContactDetailButton() {
       const contactTab = document.querySelector(
         ".hr-tabs-nav--segment-type.hr-tabs-nav--top.hr-tabs-nav"
       );
       if (!contactTab) return;
-  
+
       if (!getContactIdFromUrl()) return; // only add on contact detail urls
-  
+
       // Remove any existing container to prevent duplicates
-      const existing = document.getElementById("dashboard-target-rate-container");
+      const existing = document.getElementById(
+        "dashboard-target-rate-container"
+      );
       if (existing) existing.remove();
-  
+
       try {
         const container = document.createElement("div");
         container.id = "dashboard-target-rate-container";
         container.style.cssText =
           "margin:7px 0px 15px 0px;padding:0;display:flex;gap:8px;justify-content:flex-start;";
-  
+
         const btnLeft = document.createElement("button");
         btnLeft.id = "dashboard-target-rate-button";
         btnLeft.innerHTML =
           '<i class="fa-solid fa-bullseye" style="margin-right:6px;"></i> Rate Alert';
         btnLeft.style.cssText = `flex:1;margin:0;padding:8px 12px;background:linear-gradient(135deg,#007bff 0%,#0056b3 100%);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(0,123,255,0.3);`;
-  
+
         btnLeft.addEventListener("click", async () => {
           console.log("🎯 RATE ALERT BUTTON CLICKED - Contact Detail Page");
           const cid = getContactIdFromUrl();
           console.log("📍 Contact ID from URL:", cid);
           console.log("📍 Current URL:", window.location.href);
-  
+
           if (!cid) {
             console.error("❌ No contact ID found");
             alert("No contact ID found. Select a contact then try again.");
             return;
           }
-  
+
           try {
             console.log("🔄 Fetching contact details for ID:", cid);
             const details = await fetchContactDetails(cid);
             console.log("📋 Contact details response:", details);
-  
+
             if (!details) {
               console.error("❌ No contact details returned");
               alert("Failed to fetch contact details.");
               return;
             }
-  
+
             if (!details.contact) {
               console.error(
                 "❌ Contact details missing 'contact' property:",
@@ -4343,13 +4437,16 @@
               alert("Invalid contact details format.");
               return;
             }
-  
+
             if (!details.contact.id) {
-              console.error("❌ Contact missing 'id' property:", details.contact);
+              console.error(
+                "❌ Contact missing 'id' property:",
+                details.contact
+              );
               alert("Contact ID is missing from details.");
               return;
             }
-  
+
             console.log("✅ Valid contact found, ID:", details.contact.id);
             console.log("🚀 Calling showPopup3 with:", [cid], details);
             await showPopup3([cid], details);
@@ -4359,13 +4456,13 @@
             alert("Error loading contact details: " + err.message);
           }
         });
-  
+
         const btnRight = document.createElement("button");
         btnRight.id = "dashboard-refi-analysis-button";
         btnRight.innerHTML =
           '<i class="fa-solid fa-chart-line" style="margin-right:6px;"></i> Refi Analysis';
         btnRight.style.cssText = `flex:1;margin:0;padding:8px 12px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(16,185,129,0.3);`;
-  
+
         btnRight.addEventListener("click", async () => {
           console.log(
             "📍 📍 📍 CONTACT DETAIL REFI ANALYSIS BUTTON CLICKED 📍 📍 📍"
@@ -4378,13 +4475,13 @@
           const cid = getContactIdFromUrl();
           console.log("📍 Contact ID from URL:", cid);
           console.log("📍 Current URL:", window.location.href);
-  
+
           if (!cid) {
             console.error("❌ No contact ID found for refi analysis");
             alert("No contact ID found. Select a contact then try again.");
             return;
           }
-  
+
           try {
             console.log(
               "🔄 Fetching contact details for refi analysis, ID:",
@@ -4392,15 +4489,18 @@
             );
             const contactDetails = await fetchContactDetails(cid);
             console.log("📋 Contact details for refi:", contactDetails);
-  
+
             console.log("🔄 Fetching custom fields for location:", locationId1);
             const customFields = await fetchCustomFields(locationId1);
             console.log("📋 Custom fields:", customFields);
-  
+
             console.log("🔄 Extracting contact data...");
-            const contactData = extractContactData(contactDetails, customFields);
+            const contactData = extractContactData(
+              contactDetails,
+              customFields
+            );
             console.log("📋 Extracted contact data:", contactData);
-  
+
             console.log("🚀 Opening refi popup with data:", contactData);
             showOnDemandRefiPopup(contactData);
           } catch (error) {
@@ -4410,19 +4510,19 @@
             showOnDemandRefiPopup();
           }
         });
-  
+
         container.appendChild(btnLeft);
         container.appendChild(btnRight);
-  
+
         if (contactTab.parentNode)
           contactTab.parentNode.insertBefore(container, contactTab);
-  
+
         console.log("DEBUG: ensured contact detail two-button container");
       } catch (e) {
         console.error("ensureContactDetailButton error:", e);
       }
     }
-  
+
     function ensureConversationButton() {
       // find the "tabs" area that contains All Fields / DND / Actions
       const allTabs = document.querySelectorAll(
@@ -4441,35 +4541,38 @@
         }
       }
       if (!targetTab) return;
-  
+
       if (document.getElementById("conversation-target-rate-container")) return; // already present
-  
+
       try {
         const container = document.createElement("div");
         container.id = "conversation-target-rate-container";
         container.style.cssText =
           "margin:7px 0px 15px 0px;padding:0;display:flex;gap:8px;justify-content:flex-start;";
-  
+
         const btnLeft = document.createElement("button");
         btnLeft.id = "conversation-target-rate-button";
         btnLeft.innerHTML =
           '<i class="fa-solid fa-bullseye" style="margin-right:6px;"></i> Rate Alert';
         btnLeft.style.cssText = `flex:1;margin:0;padding:8px 12px;background:linear-gradient(135deg,#007bff 0%,#0056b3 100%);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(0,123,255,0.3);`;
-  
+
         btnLeft.addEventListener("click", async () => {
           console.log("🎯 RATE ALERT BUTTON CLICKED - Conversation Page");
           const cid = getContactIdFromConversationGlobal();
           console.log("📍 Contact ID from conversation:", cid);
           console.log("📍 Current URL:", window.location.href);
-  
+
           if (!cid) {
             console.error("❌ No contact selected in conversation");
             alert("No contact selected. Please select a conversation first.");
             return;
           }
-  
+
           try {
-            console.log("🔄 Fetching contact details for conversation ID:", cid);
+            console.log(
+              "🔄 Fetching contact details for conversation ID:",
+              cid
+            );
             const details = await fetchContactDetails(cid);
             console.log("📋 Conversation contact details (RAW):", details);
             console.log("📋 Conversation details type:", typeof details);
@@ -4477,13 +4580,13 @@
               "📋 Conversation details keys:",
               details ? Object.keys(details) : "null/undefined"
             );
-  
+
             if (!details) {
               console.error("❌ No contact details returned for conversation");
               alert("Failed to fetch contact details.");
               return;
             }
-  
+
             // More flexible validation for conversation
             let contactObj = null;
             if (details.contact) {
@@ -4506,7 +4609,7 @@
               alert("Invalid contact details format - no contact found.");
               return;
             }
-  
+
             if (!contactObj.id) {
               console.error(
                 "❌ Conversation contact object missing 'id' property:",
@@ -4519,7 +4622,7 @@
               alert("Contact ID is missing from details.");
               return;
             }
-  
+
             console.log(
               "✅ Valid conversation contact found, ID:",
               contactObj.id
@@ -4538,13 +4641,13 @@
             alert("Error loading contact details: " + err.message);
           }
         });
-  
+
         const btnRight = document.createElement("button");
         btnRight.id = "conversation-refi-analysis-button";
         btnRight.innerHTML =
           '<i class="fa-solid fa-chart-line" style="margin-right:6px;"></i> Refi Analysis';
         btnRight.style.cssText = `flex:1;margin:0;padding:8px 12px;background:linear-gradient(135deg,#10b981 0%,#059669 100%);color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 2px 6px rgba(16,185,129,0.3);`;
-  
+
         btnRight.addEventListener("click", async () => {
           console.log(
             "📍 📍 📍 CONVERSATION REFI ANALYSIS BUTTON CLICKED 📍 📍 📍"
@@ -4557,7 +4660,7 @@
           const cid = getContactIdFromConversationGlobal();
           console.log("📍 Contact ID from conversation:", cid);
           console.log("📍 Current URL:", window.location.href);
-  
+
           if (!cid) {
             console.error(
               "❌ No contact selected for conversation refi analysis"
@@ -4565,7 +4668,7 @@
             alert("No contact selected. Please select a conversation first.");
             return;
           }
-  
+
           try {
             console.log(
               "🔄 Fetching contact details for conversation refi, ID:",
@@ -4576,18 +4679,21 @@
               "📋 Conversation contact details for refi:",
               contactDetails
             );
-  
+
             console.log(
               "🔄 Fetching custom fields for conversation refi, location:",
               locationId1
             );
             const customFields = await fetchCustomFields(locationId1);
             console.log("📋 Conversation custom fields:", customFields);
-  
+
             console.log("🔄 Extracting conversation contact data...");
-            const contactData = extractContactData(contactDetails, customFields);
+            const contactData = extractContactData(
+              contactDetails,
+              customFields
+            );
             console.log("📋 Extracted conversation contact data:", contactData);
-  
+
             console.log(
               "🚀 Opening conversation refi popup with data:",
               contactData
@@ -4605,10 +4711,10 @@
             showOnDemandRefiPopup();
           }
         });
-  
+
         container.appendChild(btnLeft);
         container.appendChild(btnRight);
-  
+
         if (targetTab.parentNode)
           targetTab.parentNode.insertBefore(container, targetTab);
         console.log("DEBUG: ensured conversation two-button container");
@@ -4616,7 +4722,7 @@
         console.error("ensureConversationButton error:", e);
       }
     }
-  
+
     // Run continuously to handle SPA route changes and late DOM loads.
     // Interval is small enough to be responsive but light enough to not be intrusive.
     const ghlAutoInjectInterval = setInterval(() => {
@@ -4633,14 +4739,14 @@
         console.error("ghlAutoInjectInterval error:", e);
       }
     }, 700);
-  
+
     // Clean up on unload
     window.addEventListener("beforeunload", () => {
       clearInterval(ghlAutoInjectInterval);
     });
     // ====== POPUP CLOSE ON NAVIGATION ======
     let currentUrl = window.location.href;
-  
+
     function closeAllPopups() {
       // Close rate alert popup
       const rateAlertPopup = document.querySelector(
@@ -4649,13 +4755,13 @@
       if (rateAlertPopup) {
         rateAlertPopup.remove();
       }
-  
+
       // Close refi analysis popup
       const refiPopup = document.getElementById("on-demand-refi-popup");
       if (refiPopup) {
         refiPopup.remove();
       }
-  
+
       // Close any other modal/popup with high z-index
       const allPopups = document.querySelectorAll(
         '[style*="z-index: 9999"], [style*="z-index: 10000"], [style*="z-index: 99999"]'
@@ -4666,7 +4772,7 @@
         }
       });
     }
-  
+
     function checkForNavigation() {
       if (window.location.href !== currentUrl) {
         console.log("Navigation detected, closing popups");
@@ -4674,21 +4780,22 @@
         currentUrl = window.location.href;
       }
     }
-  
+
     // Check for navigation changes every 500ms
     setInterval(checkForNavigation, 500);
-  
+
     // Also listen for popstate events (back/forward navigation)
     window.addEventListener("popstate", () => {
       setTimeout(closeAllPopups, 100);
     });
-  
+
     // Listen for hash changes
     window.addEventListener("hashchange", () => {
       setTimeout(closeAllPopups, 100);
     });
-  
+
     // ====== END: Robust reinjection helpers ======
   })();
-  
+
+
 </script>
