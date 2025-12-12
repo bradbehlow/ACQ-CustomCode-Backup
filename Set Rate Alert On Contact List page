@@ -1,4 +1,11 @@
 <script>
+ /* Set Rate aler on contact detail page */
+  
+
+
+
+
+
   (function () {
     "use strict";
 
@@ -172,7 +179,8 @@
       title,
       ratesObject,
       customerData = [],
-      inputType = "number"
+      inputType = "number",
+      errorMessage = null
     ) {
       const overlay = document.createElement("div");
       overlay.style.cssText = `
@@ -1322,6 +1330,24 @@
                                   <input type="number" id="dropAmountInput" class="drop-input input-focus-effect no-wheel-change" step="0.01" placeholder="Enter amount (e.g. 0.50)">
                                   <div class="input-suffix">%</div>
                               </div>
+                              
+                              <!-- Error message for drop amount -->
+                              <div id="drop-amount-error" style="
+                                  display: ${errorMessage ? "block" : "none"};
+                                  margin-top: 8px;
+                                  padding: 8px 12px;
+                                  background: #fef2f2;
+                                  border: 1px solid #fecaca;
+                                  border-radius: 6px;
+                                  color: #dc2626;
+                                  font-size: 12px;
+                                  font-weight: 500;
+                              ">
+                                  <svg style="width: 14px; height: 14px; display: inline-block; margin-right: 6px; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
+                                      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                                  </svg>
+                                  ${errorMessage || ""}
+                              </div>
                           </div>
                       </div>
               
@@ -1443,6 +1469,12 @@
           radioOptions.forEach((opt) => opt.classList.remove("selected"));
           option.classList.add("selected");
 
+          // Clear any error messages
+          const errorDiv = document.getElementById("drop-amount-error");
+          if (errorDiv) {
+            errorDiv.style.display = "none";
+          }
+
           const type = option.dataset.type;
           if (type === "target") {
             targetRateSection.style.display = "block";
@@ -1454,6 +1486,14 @@
             dropAmountSection.style.display = "block";
             dropAmountInput.focus();
             targetRateInput.value = "";
+            // Show error if it was passed as parameter
+            if (errorMessage) {
+              setTimeout(() => {
+                if (errorDiv) {
+                  errorDiv.style.display = "block";
+                }
+              }, 100);
+            }
           }
         });
       });
@@ -1634,11 +1674,6 @@
           const selectedType = document.querySelector(".radio-option.selected")
             .dataset.type;
 
-          //   if (selectedType === "target" && !targetRateValue.trim()) {
-          //     alert("Please enter a Target Rate value.");
-          //     return null;
-          //   }
-
           // Only require target rate if NO advanced adjustment is provided
           const hasAdjustment =
             adjustmentValue.trim() && adjustmentValue !== "-";
@@ -1654,6 +1689,31 @@
           if (selectedType === "drop" && !dropAmountValue.trim()) {
             alert("Please enter a Drop Amount value.");
             return null;
+          }
+
+          // Check for missing interest rate when using drop amount
+          if (selectedType === "drop") {
+            const hasValidRate = customerData.some((contact) => {
+              const rate = parseFloat(contact.rate);
+              return !isNaN(rate) && rate > 0;
+            });
+
+            if (!hasValidRate) {
+              // Show inline error instead of alert
+              const errorDiv = document.getElementById("drop-amount-error");
+              if (errorDiv) {
+                errorDiv.style.display = "block";
+                errorDiv.innerHTML = `
+                  <svg style="width: 14px; height: 14px; display: inline-block; margin-right: 6px; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                  </svg>
+                  Missing interest rate — Please enter a current rate to set this alert.
+                `;
+                // Focus the drop amount input to draw attention
+                document.getElementById("dropAmountInput").focus();
+              }
+              return null;
+            }
           }
 
           // If advanced adjustment is provided, auto-calculate the target rate
@@ -1735,7 +1795,7 @@
     // END OF createGHLCustomModal - PASTE ABOVE THIS LINE
     // ============================================
 
-    function showSuccessPopup(message, autoClose = true) {
+    function showSuccessPopup(message, autoClose = false) {
       const overlay = document.createElement("div");
       overlay.style.cssText = `
         position: fixed;
@@ -1811,7 +1871,11 @@
           </div>
           <div style="margin-bottom: 20px;">
             <div style="margin-bottom: 10px; font-size: 14px; line-height: 1.4; color: #1e293b; font-weight: 500;">You'll be notified when the market meets your conditions.</div>
-            <div style="font-size: 12px; line-height: 1.5; color: #64748b;">You can view and manage all rate alerts on your dashboard.</div>
+            <div style="font-size: 12px; line-height: 1.5; color: #64748b;">
+              <span id="dashboardLink" style="color: #3b82f6; text-decoration: underline; font-weight: 500; cursor: pointer;">
+                You can view and manage all rate alerts on your dashboard.
+              </span>
+            </div>
           </div>
           <button id="successPopupOk" style="padding: 12px 23px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 12px; color: white; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4); min-width: 180px;">Close window</button>
         </div>
@@ -1830,11 +1894,31 @@
         uncheckAllCheckboxes();
       };
 
+      document.getElementById("dashboardLink").addEventListener("click", () => {
+        uncheckAllCheckboxes();
+        closePopup();
+        const locationId = utils.getLocationIdFromUrl();
+        if (locationId) {
+          const baseUrl = window.location.hostname.includes("konnectd.io")
+            ? "https://app.konnectd.io"
+            : "https://app.gohighlevel.com";
+          const dashboardUrl =
+            baseUrl + "/v2/location/" + locationId + "/dashboard";
+          window.open(dashboardUrl, "_blank");
+        }
+      });
+
       document
         .getElementById("successPopupOk")
-        .addEventListener("click", closePopup);
+        .addEventListener("click", () => {
+          uncheckAllCheckboxes();
+          closePopup();
+        });
       overlay.addEventListener("click", (e) => {
-        if (e.target === overlay) closePopup();
+        if (e.target === overlay) {
+          uncheckAllCheckboxes();
+          closePopup();
+        }
       });
       document.addEventListener("keydown", function handleKey(e) {
         if (e.key === "Enter" || e.key === "Escape") {
@@ -1842,12 +1926,6 @@
           document.removeEventListener("keydown", handleKey);
         }
       });
-
-      if (autoClose) {
-        setTimeout(() => {
-          if (document.body.contains(overlay)) closePopup();
-        }, 4000);
-      }
     }
 
     async function showPopup3(contactIds, singleContactDetails = null) {
@@ -1986,17 +2064,6 @@
         } else {
           const dropAmount = parseFloat(targetRate.dropAmount);
           const contactCurrentInterestRate = parseFloat(customerData[0].rate);
-
-          if (
-            isNaN(contactCurrentInterestRate) ||
-            contactCurrentInterestRate === 0
-          ) {
-            alert(
-              "Cannot set drop amount alert: Contact's current interest rate is not available or invalid."
-            );
-            return;
-          }
-
           optimalTargetValue = contactCurrentInterestRate - dropAmount;
         }
 
@@ -2072,19 +2139,114 @@
 
     const buttonManager = {
       updateButton() {
+        console.log("🔧 ButtonManager.updateButton() called");
+        console.log(
+          "📊 Current selectedContactIds.length:",
+          state.selectedContactIds.length
+        );
+
         if (state.selectedContactIds.length > 0) {
-          if (!document.getElementById("set-rate-alert-btn")) {
+          console.log("✅ Contacts selected, checking if button exists...");
+          const existingBtn = document.getElementById("set-rate-alert-btn");
+          console.log("🔍 Existing button found:", !!existingBtn);
+
+          if (!existingBtn) {
+            console.log("🚀 Calling injectButton()...");
             this.injectButton();
+          } else {
+            console.log("ℹ️ Button already exists, skipping injection");
           }
         } else {
+          console.log("❌ No contacts selected, removing button if exists...");
           const btn = document.getElementById("set-rate-alert-btn");
-          if (btn) btn.remove();
+          if (btn) {
+            btn.remove();
+            console.log("🗑️ Button removed");
+          } else {
+            console.log("ℹ️ No button to remove");
+          }
         }
       },
 
       injectButton() {
+        console.log("🔧 ButtonManager.injectButton() called");
         const customDeleteBtn = document.getElementById("custom-delete-btn");
-        if (!customDeleteBtn) return;
+        console.log("🔍 customDeleteBtn found:", !!customDeleteBtn);
+
+        if (!customDeleteBtn) {
+          console.log(
+            "❌ customDeleteBtn not found, looking for fallback button..."
+          );
+
+          // Try to find the Add Tags button as fallback
+          const addTagsBtn = document.querySelector(
+            'button[aria-label="Add Tags"]'
+          );
+          console.log("🔍 Add Tags button found:", !!addTagsBtn);
+
+          if (addTagsBtn) {
+            console.log("✅ Using Add Tags button as fallback parent");
+            this.injectButtonAfter(addTagsBtn);
+            return;
+          }
+
+          // If Add Tags not found, try other bulk action buttons
+          const bulkActionButtons = document.querySelectorAll(
+            ".contact-bulk-action-options"
+          );
+          console.log(
+            `🔍 Found ${bulkActionButtons.length} bulk action buttons`
+          );
+
+          if (bulkActionButtons.length > 0) {
+            console.log("✅ Using first bulk action button as fallback parent");
+            this.injectButtonAfter(bulkActionButtons[0]);
+            return;
+          }
+
+          console.log(
+            "❌ No suitable parent element found for button injection"
+          );
+          return;
+        }
+
+        this.injectButtonAfter(customDeleteBtn);
+      },
+
+      injectButtonAfter(parentElement) {
+        console.log("🔧 injectButtonAfter called with element:", parentElement);
+
+        const button = this.createButton();
+
+        try {
+          parentElement.parentNode.insertBefore(
+            button,
+            parentElement.nextSibling
+          );
+          console.log(
+            "✅ Set Rate Alert button injected successfully after element"
+          );
+        } catch (error) {
+          console.log("❌ Error inserting button:", error);
+          // Try appending to parent instead
+          try {
+            parentElement.parentNode.appendChild(button);
+            console.log(
+              "✅ Set Rate Alert button appended to parent successfully"
+            );
+          } catch (appendError) {
+            console.log("❌ Error appending button:", appendError);
+            return;
+          }
+        }
+
+        // Verify injection
+        const verifyBtn = document.getElementById("set-rate-alert-btn");
+        console.log("🔍 Button verification after injection:", !!verifyBtn);
+      },
+
+      createButton() {
+        console.log("🔧 Creating Set Rate Alert button");
 
         const button = document.createElement("button");
         button.id = "set-rate-alert-btn";
@@ -2123,11 +2285,7 @@
           await showPopup3(state.selectedContactIds, null);
         });
 
-        customDeleteBtn.parentNode.insertBefore(
-          button,
-          customDeleteBtn.nextSibling
-        );
-        console.log("✅ Set Rate Alert button injected");
+        return button;
       },
     };
 
@@ -2143,7 +2301,8 @@
         document.addEventListener("click", (e) => {
           if (
             e.target.type === "checkbox" &&
-            e.target.closest(".tabulator-cell.selector")
+            (e.target.closest(".tabulator-cell.selector") ||
+              e.target.closest(".tabulator-col.selector"))
           ) {
             this.debouncedUpdate();
           }
@@ -2152,7 +2311,8 @@
         document.addEventListener("change", (e) => {
           if (
             e.target.type === "checkbox" &&
-            e.target.closest(".tabulator-cell.selector")
+            (e.target.closest(".tabulator-cell.selector") ||
+              e.target.closest(".tabulator-col.selector"))
           ) {
             this.debouncedUpdate();
           }
@@ -2165,7 +2325,7 @@
           if (headerCheckbox && !headerCheckbox.dataset.rateAlertListener) {
             headerCheckbox.dataset.rateAlertListener = "true";
             headerCheckbox.addEventListener("change", () => {
-              setTimeout(() => contactManager.updateSelectedContacts(), 150);
+              setTimeout(() => contactManager.updateSelectedContacts(), 500);
             });
           }
         });
@@ -2208,4 +2368,6 @@
       initialize();
     }
   })();
+
+
 </script>
