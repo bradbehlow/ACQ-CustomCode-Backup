@@ -1,6 +1,7 @@
 <script>
 
-    // for target rate ref button
+    
+  // for target rate ref button
 
   (function () {
     // ==========================================
@@ -2766,6 +2767,18 @@
                   onfocus="this.style.borderColor='#667eea'; this.style.background='#ffffff'; this.style.boxShadow='0 0 0 3px rgba(102, 126, 234, 0.1)'"
                   onblur="this.style.borderColor='#e5e7eb'; this.style.background='#ffffff'; this.style.boxShadow='none'"
                 >
+                <div id="newTermWarning" style="
+                  display: none;
+                  margin-top: 8px;
+                  padding: 8px 12px;
+                  background: #fef2f2;
+                  border: 1px solid #fecaca;
+                  border-radius: 6px;
+                  color: #dc2626;
+                  font-size: 13px;
+                  font-weight: 500;
+                  line-height: 1.4;
+                ">⚠️ Please double-check this value. This field expects months, not years (e.g. 360 for a 30-year loan).</div>
               </div>
             </div>
           </div>
@@ -3557,6 +3570,21 @@
         }
       };
       document.addEventListener("keydown", handleEscape);
+
+      // New Term validation
+      const newTermInput = document.getElementById("newTerm");
+      const newTermWarning = document.getElementById("newTermWarning");
+
+      newTermInput.addEventListener("input", () => {
+        const value = parseInt(newTermInput.value);
+        if (!isNaN(value) && value > 0 && value < 120) {
+          newTermWarning.style.display = "block";
+          newTermInput.style.borderColor = "#fca5a5";
+        } else {
+          newTermWarning.style.display = "none";
+          newTermInput.style.borderColor = "#e5e7eb";
+        }
+      });
     }
 
     //
@@ -4796,6 +4824,8 @@
 
     // ====== END: Robust reinjection helpers ======
   })();
+
+
 
 
 </script>
