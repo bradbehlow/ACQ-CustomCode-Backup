@@ -1,6 +1,4 @@
 <script>
-
-    
   // for target rate ref button
 
   (function () {
@@ -3320,6 +3318,32 @@
           const newRate = document.getElementById("newRate").value.trim();
           const newTerm = document.getElementById("newTerm").value.trim();
           const fundedDate = document.getElementById("fundedDate").value.trim();
+          const currentLoanAmount = document
+            .getElementById("currentLoanAmount")
+            .value.trim();
+          const currentTerm = document
+            .getElementById("currentTerm")
+            .value.trim();
+          const currentLoanRate = document
+            .getElementById("currentLoanRate")
+            .value.trim();
+          if (!currentLoanAmount) {
+            alert("Please enter the Current Loan Amount");
+            document.getElementById("currentLoanAmount").focus();
+            return;
+          }
+
+          if (!currentTerm) {
+            alert("Please enter the Current Term");
+            document.getElementById("currentTerm").focus();
+            return;
+          }
+
+          if (!currentLoanRate) {
+            alert("Please enter the Current Loan Rate");
+            document.getElementById("currentLoanRate").focus();
+            return;
+          }
 
           if (!newRate) {
             alert("Please enter a New Rate");
@@ -4824,8 +4848,4 @@
 
     // ====== END: Robust reinjection helpers ======
   })();
-
-
-
-
 </script>
