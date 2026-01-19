@@ -1,3 +1,4 @@
+<!-- Test Ref BY -->
 <script>
   (async function () {
     console.log(
@@ -1517,7 +1518,7 @@
           if (!formItem.dataset.referredByAttached) {
             formItem.dataset.referredByAttached = "true";
             // label.style.color = "#f97316";
-            label.style.fontWeight = "600";
+            label.style.fontWeight = "400";
           }
 
           const placeholderP = formItem.querySelector("p.hr-p");
